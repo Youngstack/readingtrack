@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阅读进度 - 印刷日志版</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --stamp-color: #b71c1c; 
+            --bg-color: #fdfbf7; 
+            --paper-color: #fff;
+            --line-color: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(#e6e2d8 1px, transparent 1px);
+            background-size: 20px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 20px 50px 20px; /* 底部留多点空间 */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: #fffdf5; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border: 1px solid #eaeaea;
+            border-radius: 4px; 
+            overflow: hidden;
+            padding: 25px;
+            position: relative;
+            margin-bottom: 20px;
+            z-index: 2;
+        }
+
+        /* --- 日志区域样式 (新增) --- */
+        .log-section {
+            width: 100%;
+            max-width: 380px;
+            background: #fff;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+            position: relative;
+            
+            /* 模拟打印纸效果 */
+            font-family: 'Courier New', Courier, monospace;
+            border-top: 1px dashed #bbb;
+            
+            /* 顶部锯齿装饰 (CSS clip-path) */
+            clip-path: polygon(
+                0% 10px, 
+                2% 0%, 4% 10px, 6% 0%, 8% 10px, 10% 0%, 
+                12% 10px, 14% 0%, 16% 10px, 18% 0%, 20% 10px, 
+                22% 0%, 24% 10px, 26% 0%, 28% 10px, 30% 0%, 
+                32% 10px, 34% 0%, 36% 10px, 38% 0%, 40% 10px, 
+                42% 0%, 44% 10px, 46% 0%, 48% 10px, 50% 0%, 
+                52% 10px, 54% 0%, 56% 10px, 58% 0%, 60% 10px, 
+                62% 0%, 64% 10px, 66% 0%, 68% 10px, 70% 0%, 
+                72% 10px, 74% 0%, 76% 10px, 78% 0%, 80% 10px, 
+                82% 0%, 84% 10px, 86% 0%, 88% 10px, 90% 0%, 
+                92% 10px, 94% 0%, 96% 10px, 98% 0%, 100% 10px, 
+                100% 100%, 0% 100%
+            );
+            margin-top: -15px; /* 让它看起来像从上面“吐”出来的 */
+            padding-top: 30px; 
+            z-index: 1;
+        }
+
+        .log-title {
+            text-align: center;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            color: #333;
+            text-transform: uppercase;
+        }
+
+        .log-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 13px;
+            color: #444;
+        }
+
+        .log-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-date {
+            font-weight: bold;
+        }
+
+        .log-page {
+            color: var(--stamp-color);
+        }
+
+        /* --- 原有样式 --- */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;
+        }
+        h2 { margin: 0; color: var(--primary-color); font-family: 'Georgia', serif; letter-spacing: 1px; }
+        .nav-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: var(--primary-color); font-weight: bold; }
+
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
+        .weekday { font-weight: bold; color: #555; font-size: 0.85em; padding-bottom: 10px; font-family: 'Courier New', monospace; }
+        .day-cell {
+            position: relative; height: 55px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--primary-color); font-weight: 500; z-index: 1; border-radius: 4px; transition: background 0.2s;
+        }
+        .day-cell:hover { background: #f0f0f0; }
+
+        .stamp {
+            position: absolute; top: 50%; left: 50%; width: 42px; height: 42px;
+            border: 3px double var(--stamp-color); border-radius: 50%;
+            color: var(--stamp-color); display: flex; align-items: center; justify-content: center;
+            transform: translate(-50%, -50%) rotate(-25deg); opacity: 0; pointer-events: none;
+            mix-blend-mode: multiply; z-index: 10;
+        }
+        .stamp::after {
+            content: 'READ'; font-family: 'Courier New', monospace; 
+            font-weight: 900; font-size: 11px; letter-spacing: 1px;
+            text-shadow: 0 0 1px rgba(183, 28, 28, 0.2); 
+        }
+        .stamp.is-image { border: none !important; background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .stamp.is-image::after { display: none !important; }
+        .stamp.saved { opacity: 0.85; }
+        .stamp.animate-land { opacity: 0.9; animation: stamp-land 0.35s cubic-bezier(0.5, 0, 0.75, 0) forwards; }
+        @keyframes stamp-land {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(3) rotate(10deg); }
+            70% { transform: translate(-50%, -50%) scale(0.9) rotate(-25deg); }
+            100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1) rotate(-25deg); }
+        }
+
+        .check-in-btn {
+            margin-top: 20px; width: 100%; padding: 12px;
+            background-color: var(--primary-color); color: #fff;
+            border: none; border-radius: 2px;
+            font-family: 'Courier New', monospace; font-weight: bold; font-size: 16px;
+            cursor: pointer; box-shadow: 0 4px 0 #1a252f; transition: all 0.1s;
+        }
+        .check-in-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #1a252f; }
+
+        .dashboard {
+            margin-top: 20px; padding-top: 20px; border-top: 2px dashed #ddd;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .book-settings { flex: 1; text-align: left; font-size: 12px; color: #666; font-family: 'Courier New', monospace; }
+        .book-settings input {
+            width: 60px; border: none; border-bottom: 1px solid #999; background: transparent;
+            font-family: inherit; font-weight: bold; color: var(--primary-color); text-align: center; font-size: 14px;
+        }
+
+        .progress-ring {
+            position: relative; width: 80px; height: 80px; border-radius: 50%;
+            background: conic-gradient(var(--stamp-color) var(--progress-deg, 0deg), #eee 0deg);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1); cursor: pointer;
+        }
+        .progress-ring::before {
+            content: ''; position: absolute; width: 60px; height: 60px;
+            background: #fffdf5; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .progress-text { position: absolute; z-index: 2; text-align: center; line-height: 1; }
+        .progress-percent { font-size: 16px; font-weight: bold; color: var(--stamp-color); }
+        .progress-label { font-size: 10px; color: #888; margin-top: 2px; }
+
+        .settings-link { text-align: center; margin-top: 10px; font-size: 11px; color: #999; }
+        .settings-link span { cursor: pointer; text-decoration: underline; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(44, 62, 80, 0.7); display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 100;
+        }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+        .modal {
+            background: #fffdf5; padding: 25px; border-radius: 2px; width: 85%; max-width: 320px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 4px solid var(--primary-color); text-align: left;
+        }
+        .modal-title { margin: 0 0 20px 0; font-family: 'Courier New', monospace; text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; font-family: 'Courier New'; }
+        .form-control { width: 100%; padding: 10px; border: 2px solid #ddd; font-family: 'Courier New', monospace; font-size: 16px; background: #fafafa; box-sizing: border-box; }
+        .form-control:focus { border-color: var(--primary-color); outline: none; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn { padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; font-family: 'Courier New'; }
+        .btn-cancel { background: #eee; color: #333; }
+        .btn-confirm { background: var(--stamp-color); color: white; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <button class="nav-btn" id="prevMonth">&lt;</button>
+            <h2 id="currentMonth">2023 . 10</h2>
+            <button class="nav-btn" id="nextMonth">&gt;</button>
+        </header>
+
+        <div class="calendar-grid" id="calendar">
+            </div>
+
+        <button class="check-in-btn" id="mainCheckBtn">RECORD (记录进度)</button>
+
+        <div class="dashboard">
+            <div class="book-settings">
+                <div>TOTAL PAGES:</div>
+                <div style="margin-top: 5px;">
+                    <input type="number" id="totalPagesInput" value="300" min="1"> p
+                </div>
+                <div style="margin-top: 10px; font-size: 10px; color:#aaa;">
+                    已读最高页数: <span id="maxPageRead">0</span>
+                </div>
+            </div>
+
+            <div class="progress-ring" id="progressRing">
+                <div class="progress-text">
+                    <div class="progress-percent" id="percentText">0%</div>
+                    <div class="progress-label">DONE</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-link">
+            <input type="file" id="imgUpload" accept="image/*" style="display: none;">
+            <span id="uploadText" onclick="document.getElementById('imgUpload').click()">自定义印章图案</span>
+            <span id="resetImg" style="margin-left:5px; display:none;" title="恢复默认">❌</span>
+        </div>
+    </div>
+
+    <div class="log-section">
+        <div class="log-title">HISTORY LOG</div>
+        <ul class="log-list" id="logList">
+            </ul>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h3 class="modal-title">READING LOG</h3>
+            <div class="form-group">
+                <label>DATE (日期)</label>
+                <input type="date" id="dateInput" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>PAGE REACHED (读到第几页)</label>
+                <input type="number" id="pageInput" class="form-control" placeholder="例如: 50">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" id="cancelBtn">CANCEL</button>
+                <button class="btn btn-confirm" id="confirmBtn">STAMP</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'reading_tracker_v1';
+        const IMG_KEY = 'reading_tracker_img';
+
+        const state = {
+            currentDate: new Date(),
+            records: {}, 
+            totalPages: 300,
+            customImage: null
+        };
+
+        const calendarEl = document.getElementById('calendar');
+        const monthHeaderEl = document.getElementById('currentMonth');
+        const modal = document.getElementById('modal');
+        const mainCheckBtn = document.getElementById('mainCheckBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const dateInput = document.getElementById('dateInput');
+        const pageInput = document.getElementById('pageInput');
+        const totalPagesInput = document.getElementById('totalPagesInput');
+        const progressRing = document.getElementById('progressRing');
+        const percentText = document.getElementById('percentText');
+        const maxPageReadEl = document.getElementById('maxPageRead');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const imgUpload = document.getElementById('imgUpload');
+        const resetImgBtn = document.getElementById('resetImg');
+        const uploadText = document.getElementById('uploadText');
+        const logListEl = document.getElementById('logList'); // 新增
+
+        function init() {
+            loadData();
+            renderCalendar(state.currentDate);
+            updateDashboard();
+            renderLog(); // 初始化日志
+            updateUploadUI();
+            dateInput.max = new Date().toISOString().split("T")[0]; 
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                state.records = parsed.records || {}; 
+                state.totalPages = parsed.totalPages || 300;
+            }
+            const savedImg = localStorage.getItem(IMG_KEY);
+            if (savedImg) state.customImage = savedImg;
+            totalPagesInput.value = state.totalPages;
+        }
+
+        function saveData() {
+            const dataToSave = {
+                records: state.records,
+                totalPages: Number(state.totalPages)
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+            updateDashboard();
+            renderLog(); // 保存后更新日志
+        }
+
+        // --- 新增：渲染底部日志 ---
+        function renderLog() {
+            logListEl.innerHTML = '';
+            
+            // 将记录转为数组并按日期倒序排列 (最新的在前面)
+            const sortedRecords = Object.entries(state.records).sort((a, b) => {
+                return new Date(b[0]) - new Date(a[0]);
+            });
+
+            if (sortedRecords.length === 0) {
+                logListEl.innerHTML = '<li class="log-item" style="justify-content:center; color:#999;">-- NO RECORDS --</li>';
+                return;
+            }
+
+            sortedRecords.forEach(([date, page]) => {
+                const li = document.createElement('li');
+                li.className = 'log-item';
+                
+                // 格式化日期，稍微美观一点 (替换 - 为 .)
+                const displayDate = date.replace(/-/g, '.');
+
+                li.innerHTML = `
+                    <span class="log-date">${displayDate}</span>
+                    <span class="log-page">Page ${page}</span>
+                `;
+                logListEl.appendChild(li);
+            });
+        }
+
+        function updateDashboard() {
+            const pages = Object.values(state.records);
+            const maxPage = pages.length > 0 ? Math.max(...pages) : 0;
+            maxPageReadEl.textContent = maxPage;
+
+            let percent = 0;
+            if (state.totalPages > 0) {
+                percent = (maxPage / state.totalPages) * 100;
+            }
+            if (percent > 100) percent = 100;
+
+            percentText.textContent = Math.round(percent) + '%';
+            progressRing.style.background = `conic-gradient(
+                var(--stamp-color) 0% ${percent}%, 
+                #eee ${percent}% 100%
+            )`;
+        }
+
+        totalPagesInput.addEventListener('change', (e) => {
+            let val = parseInt(e.target.value);
+            if(val < 1) val = 1;
+            state.totalPages = val;
+            saveData();
+        });
+
+        function openModal(dateStr = null) {
+            modal.classList.add('open');
+            if (dateStr) {
+                dateInput.value = dateStr;
+                if (state.records[dateStr]) {
+                    pageInput.value = state.records[dateStr];
+                } else {
+                    pageInput.value = ''; 
+                }
+            } else {
+                dateInput.valueAsDate = new Date();
+                const todayStr = dateInput.value;
+                if (state.records[todayStr]) {
+                    pageInput.value = state.records[todayStr];
+                } else {
+                    pageInput.value = '';
+                }
+            }
+            pageInput.focus();
+        }
+
+        mainCheckBtn.addEventListener('click', () => openModal());
+        cancelBtn.addEventListener('click', () => modal.classList.remove('open'));
+
+        confirmBtn.addEventListener('click', () => {
+            const dateVal = dateInput.value;
+            const pageVal = parseInt(pageInput.value);
+
+            if (!dateVal) { alert("请选择日期"); return; }
+            if (isNaN(pageVal) || pageVal < 0) { alert("请输入有效的页码"); return; }
+
+            if (pageVal > state.totalPages) {
+                if(!confirm(`输入的页码 (${pageVal}) 超过了总页数 (${state.totalPages})，确定吗？`)) {
+                    return;
+                }
+            }
+
+            const inputDate = new Date(dateVal);
+            for (const [rDateStr, rPage] of Object.entries(state.records)) {
+                const recordDate = new Date(rDateStr);
+                if (recordDate > inputDate) {
+                    if (pageVal > rPage) {
+                        alert(`保存失败！\n\n逻辑冲突：\n您在 ${rDateStr} 的记录是第 ${rPage} 页。\n\n之前的进度 (${pageVal}) 不能超过之后的进度。`);
+                        return; 
+                    }
+                }
+            }
+
+            const [y, m, d] = dateVal.split('-').map(Number);
+            if (y !== state.currentDate.getFullYear() || (m - 1) !== state.currentDate.getMonth()) {
+                state.currentDate = new Date(y, m - 1, 1);
+                renderCalendar(state.currentDate);
+            }
+
+            state.records[dateVal] = pageVal;
+            saveData(); // 这里会自动调用 renderLog()
+
+            const targetCell = document.querySelector(`.day-cell[data-date="${dateVal}"]`);
+            if (targetCell) {
+                let stamp = targetCell.querySelector('.stamp');
+                if (!stamp) {
+                    stamp = createStampElement();
+                    targetCell.appendChild(stamp);
+                }
+                stamp.classList.remove('saved'); 
+                stamp.classList.remove('animate-land');
+                void stamp.offsetWidth; 
+                stamp.classList.add('animate-land'); 
+            }
+
+            modal.classList.remove('open');
+            renderCalendar(state.currentDate);
+        });
+
+        imgUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 500 * 1024) { alert('图片太大'); return; }
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                state.customImage = event.target.result;
+                localStorage.setItem(IMG_KEY, state.customImage);
+                updateUploadUI();
+                renderCalendar(state.currentDate);
+                updateDashboard(); 
+            };
+            reader.readAsDataURL(file);
+        });
+
+        resetImgBtn.addEventListener('click', () => {
+            state.customImage = null;
+            localStorage.removeItem(IMG_KEY);
+            imgUpload.value = '';
+            updateUploadUI();
+            renderCalendar(state.currentDate);
+        });
+
+        function updateUploadUI() {
+            if (state.customImage) {
+                uploadText.textContent = "已使用自定义印章";
+                resetImgBtn.style.display = "inline-block";
+            } else {
+                uploadText.textContent = "自定义印章图案";
+                resetImgBtn.style.display = "none";
+            }
+        }
+
+        prevMonthBtn.addEventListener('click', () => {
+            state.currentDate.setMonth(state.currentDate.getMonth() - 1);
+            renderCalendar(state.currentDate);
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            state.currentDate.setMonth(state.currentDate.getMonth() + 1);
+            renderCalendar(state.currentDate);
+        });
+
+        function createStampElement() {
+            const stamp = document.createElement('div');
+            stamp.className = 'stamp';
+            if (state.customImage) {
+                stamp.classList.add('is-image');
+                stamp.style.backgroundImage = `url(${state.customImage})`;
+            }
+            const randomRotate = Math.floor(Math.random() * 20) - 30;
+            stamp.style.transform = `translate(-50%, -50%) rotate(${randomRotate}deg)`;
+            return stamp;
+        }
+
+        function renderCalendar(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+
+            monthHeaderEl.textContent = `${year} . ${String(month + 1).padStart(2,'0')}`;
+            calendarEl.innerHTML = '';
+            
+            const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            weekdays.forEach(day => {
+                const wd = document.createElement('div');
+                wd.className = 'weekday';
+                wd.textContent = day;
+                calendarEl.appendChild(wd);
+            });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'day-cell empty';
+                calendarEl.appendChild(emptyCell);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'day-cell';
+                dayCell.textContent = i;
+                
+                const dateStr = formatDateStr(year, month + 1, i);
+                dayCell.dataset.date = dateStr;
+
+                if (state.records[dateStr] !== undefined) {
+                    const stamp = createStampElement();
+                    stamp.classList.add('saved');
+                    dayCell.title = `读到第 ${state.records[dateStr]} 页`;
+                    dayCell.appendChild(stamp);
+                }
+
+                dayCell.addEventListener('click', () => openModal(dateStr));
+                calendarEl.appendChild(dayCell);
+            }
+        }
+
+        function formatDateStr(year, month, day) {
+            return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        init();
+    </script>
+</body>
+</html>
