@@ -3,19 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>阅读进度 - 桌面宽屏版 (目标日期+实际/预计差值条)</title>
+  <title>阅读进度 - 桌面宽屏版 (目标日期+差值条-右侧印刷风)</title>
   <style>
     :root {
       --primary-color: #2c3e50;
       --stamp-color: #b71c1c; /* 朱砂红 */
       --bg-color: #fdfbf7;
       --paper-color: #fffdf5;
-      --border-color: #eaeaea;
 
-      --track-bg: #efefef;
-      --track-border: #d7d7d7;
-      --ok-color: #2c3e50;
-      --warn-color: #b71c1c;
+      --ink: #2c3e50;
+      --muted: #666;
+      --line: #d7d7d7;
+
+      --track-bg: #f3f3f3;
+      --track-border: #cfcfcf;
     }
 
     body {
@@ -79,11 +80,7 @@
     .nav-btn { background: none; border: 1px solid #ddd; border-radius: 4px; padding: 5px 12px; cursor: pointer; color: #555; transition: 0.2s; }
     .nav-btn:hover { background: #eee; }
 
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 10px;
-    }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
 
     .weekday {
       text-align: center; font-weight: bold; color: #888;
@@ -115,7 +112,7 @@
     }
     .day-cell:hover .day-number { color: var(--primary-color); }
 
-    /* 印章容器：透明底 + 叠印效果 */
+    /* stamp */
     .stamp-container {
       position: absolute;
       top: 50%; left: 50%;
@@ -132,21 +129,14 @@
       opacity: 0.9;
       animation: stamp-land 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
-
     @keyframes stamp-land {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(2.5) rotate(10deg); }
       100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1) rotate(-20deg); }
     }
 
-    .stamp-container svg {
-      width: 100%;
-      height: 100%;
-      background: none;
-      color: var(--stamp-color);
-    }
+    .stamp-container svg { width: 100%; height: 100%; background: none; color: var(--stamp-color); }
     .stamp-ring { fill: none; stroke: currentColor; }
-
-    .stamp-text-path, .stamp-center-text, .stamp-time-text { fill: currentColor; }
+    .stamp-text-path, .stamp-center-text { fill: currentColor; }
     .stamp-text-path {
       font-family: "SimSun","Songti SC","Noto Serif SC","STSong","Times New Roman",serif;
       font-weight: 700;
@@ -163,37 +153,22 @@
 
     .stamp-custom-wrap { position: relative; width: 100%; height: 100%; }
     .stamp-custom-img {
-      position: absolute;
-      inset: 0;
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      mix-blend-mode: multiply;
-      opacity: 0.92;
-      filter: contrast(1.05);
+      position: absolute; inset: 0;
+      background-size: contain; background-repeat: no-repeat; background-position: center;
+      mix-blend-mode: multiply; opacity: 0.92; filter: contrast(1.05);
     }
-    .stamp-custom-overlay {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      pointer-events: none;
-    }
-    .stamp-custom-overlay svg {
-      width: 100%;
-      height: 100%;
-      background: none;
-      color: var(--stamp-color);
-    }
+    .stamp-custom-overlay { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+    .stamp-custom-overlay svg { width: 100%; height: 100%; background: none; color: var(--stamp-color); }
 
+    /* bottom controls */
     .controls-area {
       margin-top: 30px;
       padding-top: 20px;
       border-top: 2px dashed #ddd;
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 18px;
-      align-items: start;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
     }
 
     .main-btn {
@@ -205,7 +180,7 @@
     }
     .main-btn:active { transform: translateY(4px); box-shadow: none; }
 
-    .progress-wrapper { display: flex; align-items: center; gap: 15px; justify-content: flex-end; }
+    .progress-wrapper { display: flex; align-items: center; gap: 15px; }
     .progress-ring {
       position: relative; width: 60px; height: 60px; border-radius: 50%;
       background: conic-gradient(var(--stamp-color) var(--p, 0%), #eee 0%);
@@ -217,13 +192,14 @@
     }
     .progress-val { position: relative; font-size: 12px; font-weight: bold; color: var(--stamp-color); }
 
+    /* right log */
     .log-header {
       text-align: center; padding: 0 20px 15px 20px;
       border-bottom: 2px solid #333; margin: 0 20px 10px 20px;
     }
     .log-title { font-family: 'Georgia'; font-weight: bold; font-size: 16px; letter-spacing: 1px; }
 
-    .log-list { list-style: none; padding: 0 20px 20px 20px; margin: 0; max-height: 600px; overflow-y: auto; }
+    .log-list { list-style: none; padding: 0 20px 20px 20px; margin: 0; max-height: 520px; overflow-y: auto; }
     .log-item {
       display: flex; justify-content: space-between;
       padding: 12px 0; border-bottom: 1px dashed #ccc;
@@ -232,6 +208,7 @@
     .log-date { font-weight: bold; color: #333; }
     .log-page { color: var(--stamp-color); }
 
+    /* modal */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(44, 62, 80, 0.6); backdrop-filter: blur(2px);
@@ -256,33 +233,38 @@
     .btn-confirm { background: var(--stamp-color); color: #fff; }
 
     .upload-link { font-size: 12px; color: #999; text-decoration: underline; cursor: pointer; display: block; margin-top: 5px;}
-    .hint {
-      margin-top: 8px;
-      font-size: 11px;
-      color: #888;
-      line-height: 1.4;
-      max-width: 340px;
+    .hint { margin-top: 8px; font-size: 11px; color: #888; line-height: 1.4; max-width: 260px; }
+
+    /* =========================
+       NEW: plan section on right
+       ========================= */
+    .plan-section {
+      margin: 12px 20px 10px 20px; /* 与 log-header / log-list 同宽对齐 */
+      padding: 12px 12px 10px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.75), rgba(250,250,250,0.75)),
+        radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
+      background-size: auto, 10px 10px;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,0.03);
     }
 
-    /* ===== 新增：计划读完日期 + 实际/预计差值条 ===== */
-    .plan-card {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 14px 14px 12px 14px;
-      background: rgba(255,255,255,0.55);
-    }
-    .plan-row {
+    .plan-top {
       display: grid;
       grid-template-columns: 1fr 140px;
       gap: 10px;
       align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #cfcfcf;
+      margin-bottom: 10px;
     }
     .plan-title {
-      font-family: 'Courier New', monospace;
-      font-weight: 700;
-      color: var(--primary-color);
-      letter-spacing: 0.4px;
-      font-size: 13px;
+      font-family: "Courier New", monospace;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: var(--ink);
+      font-size: 12px;
     }
     .plan-input {
       width: 100%;
@@ -290,85 +272,95 @@
       border: 1px solid #cfcfcf;
       border-radius: 6px;
       background: #fff;
-      font-family: 'Courier New', monospace;
+      font-family: "Courier New", monospace;
       font-size: 13px;
       box-sizing: border-box;
     }
 
-    .delta-wrap { margin-top: 12px; }
     .delta-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
       gap: 10px;
-      font-family: 'Courier New', monospace;
+      font-family: "Courier New", monospace;
+      margin-bottom: 8px;
     }
     .delta-kpi {
-      font-weight: 800;
+      font-weight: 900;
       font-size: 14px;
       letter-spacing: 0.3px;
+      color: var(--stamp-color);
     }
-    .delta-kpi.good { color: var(--ok-color); }
-    .delta-kpi.bad { color: var(--warn-color); }
     .delta-sub {
       font-size: 12px;
-      color: #666;
+      color: var(--muted);
       white-space: nowrap;
     }
 
+    /* 印刷风进度条：细描边 + 网点 + “尺规虚线” */
     .bar-track {
       position: relative;
       height: 14px;
-      margin-top: 10px;
       border: 1px solid var(--track-border);
       border-radius: 999px;
-      background: linear-gradient(180deg, #fafafa, var(--track-bg));
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.9), rgba(240,240,240,0.9)),
+        radial-gradient(rgba(0,0,0,0.06) 0.8px, transparent 0.9px);
+      background-size: auto, 6px 6px;
       overflow: hidden;
     }
+
     .bar-actual {
       position: absolute;
-      left: 0;
-      top: 0;
+      left: 0; top: 0;
       height: 100%;
       width: 0%;
-      background: var(--stamp-color);
+      background:
+        linear-gradient(180deg, rgba(183,28,28,0.92), rgba(150,18,18,0.92));
       border-radius: 999px;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+      /* 油墨轻微压痕 */
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        inset 0 -1px 0 rgba(0,0,0,0.18),
+        0 0 0 1px rgba(0,0,0,0.08);
     }
-    /* 预计值：虚线竖指示线 */
+
+    /* 预计线：像尺规一样，有顶部小帽 + 虚线主体 */
     .bar-expected-line {
       position: absolute;
-      top: -6px;
-      height: 26px;
+      top: -7px;
+      height: 28px;
       width: 0;
-      border-left: 2px dashed rgba(44,62,80,0.75);
       left: 0%;
+      border-left: 2px dashed rgba(44,62,80,0.7);
       pointer-events: none;
     }
+    .bar-expected-line::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -5px;
+      width: 10px;
+      height: 0;
+      border-top: 2px solid rgba(44,62,80,0.7);
+    }
+
     .bar-legend {
       margin-top: 8px;
       display: flex;
       justify-content: space-between;
       gap: 10px;
-      font-family: 'Courier New', monospace;
+      font-family: "Courier New", monospace;
       font-size: 11px;
-      color: #666;
-    }
-    .legend-item {
-      display: inline-flex;
+      color: var(--muted);
       align-items: center;
-      gap: 6px;
-      white-space: nowrap;
+      flex-wrap: wrap;
     }
-    .dot {
-      width: 14px; height: 8px;
-      border-radius: 999px;
-      background: var(--stamp-color);
-    }
-    .dash {
-      width: 14px; height: 0;
-      border-top: 2px dashed rgba(44,62,80,0.75);
-    }
+
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .dot { width: 14px; height: 8px; border-radius: 999px; background: var(--stamp-color); }
+    .dash { width: 14px; height: 0; border-top: 2px dashed rgba(44,62,80,0.7); }
+    .plan-meta { opacity: 0.95; }
 
   </style>
 </head>
@@ -386,7 +378,6 @@
     <div class="calendar-grid" id="calendar"></div>
 
     <div class="controls-area">
-      <!-- 左侧：操作 + 设置 -->
       <div>
         <button class="main-btn" id="mainCheckBtn">RECORD TODAY</button>
 
@@ -399,38 +390,11 @@
           <span class="upload-link" id="resetImg" style="display:none; color:red;">[恢复默认印章]</span>
           <input type="file" id="imgUpload" accept="image/*" style="display: none;">
           <div class="hint">
-            自定义图片将自动“白底透明化”（阈值处理，适合白底/浅底图）。若图片背景复杂，透明化效果可能不理想。
-          </div>
-        </div>
-
-        <!-- 新增：计划读完日期 + 差值条 -->
-        <div class="plan-card" style="margin-top:14px;">
-          <div class="plan-row">
-            <div class="plan-title">TARGET FINISH DATE</div>
-            <input type="date" id="finishDateInput" class="plan-input" />
-          </div>
-
-          <div class="delta-wrap">
-            <div class="delta-header">
-              <div id="deltaKpi" class="delta-kpi">Δ 0%</div>
-              <div id="deltaSub" class="delta-sub">Actual 0% | Expected 0%</div>
-            </div>
-
-            <div class="bar-track" aria-label="progress-delta-bar">
-              <div id="barActual" class="bar-actual"></div>
-              <div id="barExpected" class="bar-expected-line" title="Expected (dashed)"></div>
-            </div>
-
-            <div class="bar-legend">
-              <span class="legend-item"><span class="dot"></span>Actual</span>
-              <span class="legend-item"><span class="dash"></span>Expected</span>
-              <span class="legend-item" id="planMeta">Start - / End -</span>
-            </div>
+            自定义图片将自动“白底透明化”（阈值处理）。背景复杂时效果可能不理想。
           </div>
         </div>
       </div>
 
-      <!-- 右侧：总进度环 -->
       <div class="progress-wrapper">
         <div class="progress-ring" id="progressRing">
           <div class="progress-val" id="percentText">0%</div>
@@ -448,6 +412,31 @@
       <div class="log-title">READING LOG</div>
       <div style="font-size:10px; color:#999; margin-top:5px;">HISTORY RECORDS</div>
     </div>
+
+    <!-- ✅ 计划/差值条：放到天级明细下面，宽度与 log 对齐 -->
+    <div class="plan-section" id="planSection">
+      <div class="plan-top">
+        <div class="plan-title">TARGET FINISH DATE</div>
+        <input type="date" id="finishDateInput" class="plan-input" />
+      </div>
+
+      <div class="delta-header">
+        <div id="deltaKpi" class="delta-kpi">Δ 0%</div>
+        <div id="deltaSub" class="delta-sub">Actual 0% | Expected 0%</div>
+      </div>
+
+      <div class="bar-track" aria-label="progress-delta-bar">
+        <div id="barActual" class="bar-actual"></div>
+        <div id="barExpected" class="bar-expected-line" title="Expected (dashed)"></div>
+      </div>
+
+      <div class="bar-legend">
+        <span class="legend-item"><span class="dot"></span>Actual</span>
+        <span class="legend-item"><span class="dash"></span>Expected</span>
+        <span class="legend-item plan-meta" id="planMeta">Start - / End -</span>
+      </div>
+    </div>
+
     <ul class="log-list" id="logList"></ul>
   </div>
 
@@ -481,13 +470,10 @@
 
   const state = {
     currentDate: new Date(),
-    // records: { "YYYY-MM-DD": { page: number, ts: number(ms) } }
     records: {},
     totalPages: 300,
     customImage: null,
-
-    // plan
-    finishDate: null, // "YYYY-MM-DD"
+    finishDate: null,
   };
 
   // DOM
@@ -501,7 +487,7 @@
   const imgUpload = document.getElementById('imgUpload');
   const resetImgBtn = document.getElementById('resetImg');
 
-  // new plan UI
+  // plan UI
   const finishDateInput = document.getElementById('finishDateInput');
   const barActualEl = document.getElementById('barActual');
   const barExpectedEl = document.getElementById('barExpected');
@@ -516,61 +502,48 @@
     updateDashboard();
     updateUploadUI();
 
-    // plan init
     finishDateInput.value = state.finishDate || '';
-    finishDateInput.min = new Date().toISOString().split("T")[0]; // 允许从今天起
+    finishDateInput.min = new Date().toISOString().split("T")[0];
     finishDateInput.addEventListener('change', onFinishDateChange);
 
     dateInput.max = new Date().toISOString().split("T")[0];
 
-    // initial plan bar
     updatePlanDeltaBar();
   }
 
-  // -------------------------
-  // Utilities
-  // -------------------------
   function pad2(n){ return String(n).padStart(2,'0'); }
   function todayStr() {
     const d = new Date();
     return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
   }
-
   function formatHM(ts) {
     if (!ts) return '';
     const d = new Date(ts);
     return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
   }
-
   function getRecordPage(rec) {
     if (rec == null) return null;
     if (typeof rec === 'number') return rec;
     if (typeof rec === 'object' && rec.page != null) return rec.page;
     return null;
   }
-
   function getRecordTs(rec) {
     if (rec == null) return null;
     if (typeof rec === 'object' && rec.ts != null) return rec.ts;
     return null;
   }
-
   function clamp01(x){ return Math.max(0, Math.min(1, x)); }
 
   function parseDateOnly(yyyyMMdd) {
-    // 强制用本地“日”对齐，避免时区偏移
     const [y,m,d] = yyyyMMdd.split('-').map(Number);
-    return new Date(y, m-1, d, 12, 0, 0, 0); // noon to reduce DST edge
+    return new Date(y, m-1, d, 12, 0, 0, 0);
   }
-
   function daysBetween(a, b) {
     const ms = b.getTime() - a.getTime();
     return Math.round(ms / 86400000);
   }
 
-  // -------------------------
-  // Stamp generators
-  // -------------------------
+  // stamps
   function createDefaultStampSVG(dateStr) {
     const formattedDate = dateStr.replace(/-/g, '.');
     const rec = state.records[dateStr];
@@ -631,9 +604,7 @@
     return createDefaultStampSVG(dateStr);
   }
 
-  // -------------------------
-  // Calendar render
-  // -------------------------
+  // calendar
   function renderCalendar(date) {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -688,11 +659,8 @@
     }
   }
 
-  // -------------------------
-  // Storage
-  // -------------------------
+  // storage
   function loadData() {
-    // 兼容旧 key
     const v2 = localStorage.getItem('reading_desktop_v2');
     const v1 = localStorage.getItem('reading_desktop_v1');
     const cur = localStorage.getItem(STORAGE_KEY);
@@ -717,7 +685,6 @@
     const img = localStorage.getItem(IMG_KEY) || localStorage.getItem('reading_desktop_img') || localStorage.getItem('reading_desktop_img_v2');
     if (img) state.customImage = img;
 
-    // plan
     const plan = localStorage.getItem(PLAN_KEY);
     if (plan) {
       try {
@@ -740,15 +707,11 @@
   }
 
   function savePlan() {
-    localStorage.setItem(PLAN_KEY, JSON.stringify({
-      finishDate: state.finishDate
-    }));
+    localStorage.setItem(PLAN_KEY, JSON.stringify({ finishDate: state.finishDate }));
     updatePlanDeltaBar();
   }
 
-  // -------------------------
-  // Log & Dashboard
-  // -------------------------
+  // log & dashboard
   function renderLog() {
     logListEl.innerHTML = '';
     const sorted = Object.entries(state.records)
@@ -785,9 +748,7 @@
     progressRing.style.setProperty('--p', p + '%');
   }
 
-  // -------------------------
-  // NEW: Plan / Delta Bar Logic
-  // -------------------------
+  // plan/delta
   function onFinishDateChange(e) {
     const val = e.target.value;
     state.finishDate = val || null;
@@ -795,7 +756,6 @@
   }
 
   function getStartDateForPlan() {
-    // 计划开始日：取最早记录日期；没有记录则用今天
     const keys = Object.keys(state.records);
     if (!keys.length) return todayStr();
     keys.sort((a,b) => new Date(a) - new Date(b));
@@ -811,14 +771,13 @@
 
   function calcExpectedPct() {
     if (!state.finishDate) return 0;
-
     const startStr = getStartDateForPlan();
     const start = parseDateOnly(startStr);
     const end = parseDateOnly(state.finishDate);
     const now = parseDateOnly(todayStr());
 
     const total = daysBetween(start, end);
-    if (total <= 0) return 1; // end <= start：视为应完成
+    if (total <= 0) return 1;
 
     const elapsed = daysBetween(start, now);
     return clamp01(elapsed / total);
@@ -832,43 +791,29 @@
     const actual = calcActualPct();
     const expected = state.finishDate ? calcExpectedPct() : 0;
 
-    // UI: bar
     barActualEl.style.width = `${Math.round(actual*1000)/10}%`;
 
-    // 预计线：如果未设置 finishDate，就隐藏
     if (!state.finishDate) {
       barExpectedEl.style.display = 'none';
-    } else {
-      barExpectedEl.style.display = 'block';
-      barExpectedEl.style.left = `${Math.round(expected*1000)/10}%`;
+      deltaSubEl.textContent = `Actual ${Math.round(actual*1000)/10}% | Expected -`;
+      deltaKpiEl.textContent = `Δ -`;
+      return;
     }
 
-    const delta = actual - expected; // 正：超前，负：落后
+    barExpectedEl.style.display = 'block';
+    barExpectedEl.style.left = `${Math.round(expected*1000)/10}%`;
+
+    const delta = actual - expected;
     const deltaPct = Math.round(delta * 1000) / 10;
     const actualPct = Math.round(actual * 1000) / 10;
     const expectedPct = Math.round(expected * 1000) / 10;
 
-    // KPI
     const sign = deltaPct > 0 ? '+' : '';
     deltaKpiEl.textContent = `Δ ${sign}${deltaPct}%`;
-
-    deltaKpiEl.classList.remove('good','bad');
-    // 没设置计划时，KPI展示为中性
-    if (!state.finishDate) {
-      deltaKpiEl.classList.add('good');
-      deltaSubEl.textContent = `Actual ${actualPct}% | Expected -`;
-      return;
-    }
-
-    if (delta >= 0) deltaKpiEl.classList.add('good');
-    else deltaKpiEl.classList.add('bad');
-
     deltaSubEl.textContent = `Actual ${actualPct}% | Expected ${expectedPct}%`;
   }
 
-  // -------------------------
-  // Modal
-  // -------------------------
+  // modal
   function openModal(dateStr) {
     modal.classList.add('open');
     if(dateStr) {
@@ -892,7 +837,6 @@
     const p = parseInt(pageInput.value, 10);
     if(!d || isNaN(p)) return alert('Please enter valid date and page.');
 
-    // 逻辑校验（保持原约束）
     const inputD = new Date(d);
     for(const [rd, rv] of Object.entries(state.records)) {
       const rp = getRecordPage(rv);
@@ -905,14 +849,12 @@
     state.records[d] = { page: p, ts: nowTs };
     saveData();
 
-    // 如果不在当前月，切过去
     const [y,m] = d.split('-').map(Number);
     if(y !== state.currentDate.getFullYear() || m-1 !== state.currentDate.getMonth()) {
       state.currentDate = new Date(y, m-1, 1);
       renderCalendar(state.currentDate);
     }
 
-    // 动画盖章
     const cell = document.querySelector(`.day-cell[data-date="${d}"]`);
     if(cell) {
       const old = cell.querySelector('.stamp-container');
@@ -929,9 +871,7 @@
     modal.classList.remove('open');
   });
 
-  // -------------------------
-  // Month navigation
-  // -------------------------
+  // month nav
   document.getElementById('prevMonth').addEventListener('click', () => {
     state.currentDate.setMonth(state.currentDate.getMonth()-1);
     renderCalendar(state.currentDate);
@@ -941,21 +881,16 @@
     renderCalendar(state.currentDate);
   });
 
-  // -------------------------
-  // Settings
-  // -------------------------
+  // settings
   document.getElementById('totalPagesInput').addEventListener('change', (e) => {
     state.totalPages = e.target.value;
     saveData();
   });
 
-  // -------------------------
-  // Custom image -> transparent background (white/near-white)
-  // -------------------------
+  // custom image -> transparent
   imgUpload.addEventListener('change', async (e) => {
     const f = e.target.files[0];
     if(!f) return;
-
     if(f.size > 800*1024) return alert('Image too large (>800KB).');
 
     try {
