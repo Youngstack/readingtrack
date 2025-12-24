@@ -3,59 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>阅读进度 - 桌面宽屏版 (目标日期+差值条-右侧印刷风)</title>
+  <title>阅读进度 - 桌面宽屏版 (Plan+Ruler+Forecast ETA)</title>
   <style>
-    :root {
-      --primary-color: #2c3e50;
-      --stamp-color: #b71c1c; /* 朱砂红 */
-      --bg-color: #fdfbf7;
-      --paper-color: #fffdf5;
+    :root{
+      --primary-color:#2c3e50;
+      --stamp-color:#b71c1c;
+      --bg-color:#fdfbf7;
+      --paper-color:#fffdf5;
 
-      --ink: #2c3e50;
-      --muted: #666;
-      --line: #d7d7d7;
+      --ink:#2c3e50;
+      --muted:#666;
+      --line:#d7d7d7;
 
-      --track-bg: #f3f3f3;
-      --track-border: #cfcfcf;
+      --track-border:#cfcfcf;
     }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg-color);
-      background-image: radial-gradient(#e6e2d8 1px, transparent 1px);
-      background-size: 20px 20px;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 40px;
+    body{
+      font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+      background-color:var(--bg-color);
+      background-image:radial-gradient(#e6e2d8 1px, transparent 1px);
+      background-size:20px 20px;
+      display:flex; justify-content:center;
+      min-height:100vh; margin:0; padding:40px;
     }
 
-    .app-container {
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 30px;
-      width: 100%;
-      max-width: 1100px;
-      align-items: start;
+    .app-container{
+      display:grid;
+      grid-template-columns:1fr 320px;
+      gap:30px;
+      width:100%;
+      max-width:1100px;
+      align-items:start;
     }
 
-    .left-panel {
-      background: var(--paper-color);
-      border: 1px solid #dcdcdc;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-      border-radius: 8px;
-      padding: 30px;
-      position: relative;
+    .left-panel{
+      background:var(--paper-color);
+      border:1px solid #dcdcdc;
+      box-shadow:0 10px 30px rgba(0,0,0,0.05);
+      border-radius:8px;
+      padding:30px;
+      position:relative;
     }
 
-    .right-panel {
-      background: #fff;
-      border: 1px solid #dcdcdc;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-      position: relative;
-      padding: 0;
-      clip-path: polygon(
+    .right-panel{
+      background:#fff;
+      border:1px solid #dcdcdc;
+      box-shadow:0 10px 30px rgba(0,0,0,0.05);
+      position:relative;
+      padding:0;
+      clip-path:polygon(
         0% 10px, 2% 0%, 4% 10px, 6% 0%, 8% 10px, 10% 0%,
         12% 10px, 14% 0%, 16% 10px, 18% 0%, 20% 10px,
         22% 0%, 24% 10px, 26% 0%, 28% 10px, 30% 0%,
@@ -68,300 +64,394 @@
         92% 10px, 94% 0%, 96% 10px, 98% 0%, 100% 10px,
         100% 100%, 0% 100%
       );
-      padding-top: 30px;
-      min-height: 500px;
+      padding-top:30px;
+      min-height:500px;
     }
 
-    header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 25px; border-bottom: 2px solid var(--primary-color); padding-bottom: 15px;
+    header{
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:25px;
+      border-bottom:2px solid var(--primary-color);
+      padding-bottom:15px;
     }
-    h2 { margin: 0; color: var(--primary-color); font-family: 'Georgia', serif; font-size: 24px; }
-    .nav-btn { background: none; border: 1px solid #ddd; border-radius: 4px; padding: 5px 12px; cursor: pointer; color: #555; transition: 0.2s; }
-    .nav-btn:hover { background: #eee; }
+    h2{ margin:0; color:var(--primary-color); font-family:'Georgia',serif; font-size:24px; }
+    .nav-btn{
+      background:none;
+      border:1px solid #ddd;
+      border-radius:4px;
+      padding:5px 12px;
+      cursor:pointer;
+      color:#555;
+      transition:0.2s;
+    }
+    .nav-btn:hover{ background:#eee; }
 
-    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
-
-    .weekday {
-      text-align: center; font-weight: bold; color: #888;
-      padding-bottom: 15px; font-family: 'Courier New', monospace;
+    .calendar-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:10px; }
+    .weekday{
+      text-align:center; font-weight:bold; color:#888;
+      padding-bottom:15px;
+      font-family:'Courier New',monospace;
     }
 
-    .day-cell {
-      position: relative;
-      height: 100px;
-      background: rgba(255,255,255,0.5);
-      border: 1px solid transparent;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
-      overflow: hidden;
+    .day-cell{
+      position:relative;
+      height:100px;
+      background:rgba(255,255,255,0.5);
+      border:1px solid transparent;
+      border-radius:6px;
+      cursor:pointer;
+      transition:all 0.2s;
+      overflow:hidden;
     }
-    .day-cell:hover { background: #fff; border-color: #ddd; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-    .day-cell.empty { pointer-events: none; background: none; }
+    .day-cell:hover{ background:#fff; border-color:#ddd; box-shadow:0 2px 10px rgba(0,0,0,0.03); }
+    .day-cell.empty{ pointer-events:none; background:none; }
 
-    .day-number {
-      position: absolute;
-      top: 8px;
-      left: 10px;
-      font-size: 14px;
-      color: #aaa;
-      font-family: 'Arial', sans-serif;
-      font-weight: bold;
-      z-index: 3;
+    .day-number{
+      position:absolute;
+      top:8px; left:10px;
+      font-size:14px;
+      color:#aaa;
+      font-family:Arial,sans-serif;
+      font-weight:bold;
+      z-index:3;
     }
-    .day-cell:hover .day-number { color: var(--primary-color); }
+    .day-cell:hover .day-number{ color:var(--primary-color); }
 
     /* stamp */
-    .stamp-container {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 84px; height: 84px;
-      transform: translate(-50%, -50%) rotate(-20deg);
-      opacity: 0;
-      pointer-events: none;
-      mix-blend-mode: multiply;
-      z-index: 10;
-      filter: saturate(1.05);
+    .stamp-container{
+      position:absolute;
+      top:50%; left:50%;
+      width:84px; height:84px;
+      transform:translate(-50%,-50%) rotate(-20deg);
+      opacity:0;
+      pointer-events:none;
+      mix-blend-mode:multiply;
+      z-index:10;
+      filter:saturate(1.05);
     }
-    .stamp-container.saved { opacity: 0.86; }
-    .stamp-container.animate-land {
-      opacity: 0.9;
-      animation: stamp-land 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    .stamp-container.saved{ opacity:0.86; }
+    .stamp-container.animate-land{
+      opacity:0.9;
+      animation:stamp-land 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
     }
-    @keyframes stamp-land {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(2.5) rotate(10deg); }
-      100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1) rotate(-20deg); }
+    @keyframes stamp-land{
+      0%{ opacity:0; transform:translate(-50%,-50%) scale(2.5) rotate(10deg); }
+      100%{ opacity:0.9; transform:translate(-50%,-50%) scale(1) rotate(-20deg); }
+    }
+    .stamp-container svg{ width:100%; height:100%; background:none; color:var(--stamp-color); }
+    .stamp-ring{ fill:none; stroke:currentColor; }
+    .stamp-text-path, .stamp-center-text{ fill:currentColor; }
+    .stamp-text-path{
+      font-family:"SimSun","Songti SC","Noto Serif SC","STSong","Times New Roman",serif;
+      font-weight:700;
+      font-size:8.6px;
+      letter-spacing:0.4px;
+    }
+    .stamp-center-text{
+      font-family:"SimSun","Songti SC","Noto Serif SC","STSong","Times New Roman",serif;
+      font-weight:900;
+      font-size:18px;
+      text-anchor:middle;
+      dominant-baseline:middle;
     }
 
-    .stamp-container svg { width: 100%; height: 100%; background: none; color: var(--stamp-color); }
-    .stamp-ring { fill: none; stroke: currentColor; }
-    .stamp-text-path, .stamp-center-text { fill: currentColor; }
-    .stamp-text-path {
-      font-family: "SimSun","Songti SC","Noto Serif SC","STSong","Times New Roman",serif;
-      font-weight: 700;
-      font-size: 8.6px;
-      letter-spacing: 0.4px;
+    .stamp-custom-wrap{ position:relative; width:100%; height:100%; }
+    .stamp-custom-img{
+      position:absolute; inset:0;
+      background-size:contain;
+      background-repeat:no-repeat;
+      background-position:center;
+      mix-blend-mode:multiply;
+      opacity:0.92;
+      filter:contrast(1.05);
     }
-    .stamp-center-text {
-      font-family: "SimSun","Songti SC","Noto Serif SC","STSong","Times New Roman",serif;
-      font-weight: 900;
-      font-size: 18px;
-      text-anchor: middle;
-      dominant-baseline: middle;
-    }
-
-    .stamp-custom-wrap { position: relative; width: 100%; height: 100%; }
-    .stamp-custom-img {
-      position: absolute; inset: 0;
-      background-size: contain; background-repeat: no-repeat; background-position: center;
-      mix-blend-mode: multiply; opacity: 0.92; filter: contrast(1.05);
-    }
-    .stamp-custom-overlay { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
-    .stamp-custom-overlay svg { width: 100%; height: 100%; background: none; color: var(--stamp-color); }
+    .stamp-custom-overlay{ position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; }
+    .stamp-custom-overlay svg{ width:100%; height:100%; background:none; color:var(--stamp-color); }
 
     /* bottom controls */
-    .controls-area {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 2px dashed #ddd;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
+    .controls-area{
+      margin-top:30px;
+      padding-top:20px;
+      border-top:2px dashed #ddd;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
     }
+    .main-btn{
+      background:var(--primary-color); color:#fff;
+      border:none; padding:12px 25px; font-size:16px;
+      font-family:'Courier New'; font-weight:bold;
+      cursor:pointer; border-radius:4px;
+      box-shadow:0 4px 0 #1a252f;
+      transition:all 0.1s;
+    }
+    .main-btn:active{ transform:translateY(4px); box-shadow:none; }
 
-    .main-btn {
-      background: var(--primary-color); color: #fff;
-      border: none; padding: 12px 25px; font-size: 16px;
-      font-family: 'Courier New'; font-weight: bold;
-      cursor: pointer; border-radius: 4px;
-      box-shadow: 0 4px 0 #1a252f; transition: all 0.1s;
+    .progress-wrapper{ display:flex; align-items:center; gap:15px; }
+    .progress-ring{
+      position:relative; width:60px; height:60px; border-radius:50%;
+      background:conic-gradient(var(--stamp-color) var(--p,0%), #eee 0%);
+      display:flex; align-items:center; justify-content:center;
     }
-    .main-btn:active { transform: translateY(4px); box-shadow: none; }
-
-    .progress-wrapper { display: flex; align-items: center; gap: 15px; }
-    .progress-ring {
-      position: relative; width: 60px; height: 60px; border-radius: 50%;
-      background: conic-gradient(var(--stamp-color) var(--p, 0%), #eee 0%);
-      display: flex; align-items: center; justify-content: center;
+    .progress-ring::before{
+      content:'';
+      position:absolute;
+      width:44px; height:44px;
+      background:var(--paper-color);
+      border-radius:50%;
     }
-    .progress-ring::before {
-      content: ''; position: absolute; width: 44px; height: 44px;
-      background: var(--paper-color); border-radius: 50%;
-    }
-    .progress-val { position: relative; font-size: 12px; font-weight: bold; color: var(--stamp-color); }
+    .progress-val{ position:relative; font-size:12px; font-weight:bold; color:var(--stamp-color); }
 
     /* right log */
-    .log-header {
-      text-align: center; padding: 0 20px 15px 20px;
-      border-bottom: 2px solid #333; margin: 0 20px 10px 20px;
+    .log-header{
+      text-align:center;
+      padding:0 20px 15px 20px;
+      border-bottom:2px solid #333;
+      margin:0 20px 10px 20px;
     }
-    .log-title { font-family: 'Georgia'; font-weight: bold; font-size: 16px; letter-spacing: 1px; }
+    .log-title{ font-family:'Georgia'; font-weight:bold; font-size:16px; letter-spacing:1px; }
 
-    .log-list { list-style: none; padding: 0 20px 20px 20px; margin: 0; max-height: 520px; overflow-y: auto; }
-    .log-item {
-      display: flex; justify-content: space-between;
-      padding: 12px 0; border-bottom: 1px dashed #ccc;
-      font-family: 'Courier New', monospace; font-size: 13px;
+    .log-list{
+      list-style:none;
+      padding:0 20px 20px 20px;
+      margin:0;
+      max-height:520px;
+      overflow-y:auto;
     }
-    .log-date { font-weight: bold; color: #333; }
-    .log-page { color: var(--stamp-color); }
+    .log-item{
+      display:flex;
+      justify-content:space-between;
+      padding:12px 0;
+      border-bottom:1px dashed #ccc;
+      font-family:'Courier New',monospace;
+      font-size:13px;
+    }
+    .log-date{ font-weight:bold; color:#333; }
+    .log-page{ color:var(--stamp-color); }
 
     /* modal */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(44, 62, 80, 0.6); backdrop-filter: blur(2px);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; visibility: hidden; transition: 0.3s; z-index: 1000;
+    .modal-overlay{
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(44,62,80,0.6); backdrop-filter:blur(2px);
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; visibility:hidden; transition:0.3s; z-index:1000;
     }
-    .modal-overlay.open { opacity: 1; visibility: visible; }
-    .modal {
-      background: #fff; padding: 30px; width: 320px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.2); border-radius: 4px;
-      border: 1px solid #ccc;
+    .modal-overlay.open{ opacity:1; visibility:visible; }
+    .modal{
+      background:#fff; padding:30px; width:320px;
+      box-shadow:0 20px 40px rgba(0,0,0,0.2);
+      border-radius:4px;
+      border:1px solid #ccc;
     }
-    .form-group { margin-bottom: 15px; }
-    .form-label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; font-family: 'Courier New'; }
-    .form-input {
-      width: 100%; padding: 10px; border: 1px solid #ccc; background: #f9f9f9;
-      font-family: 'Courier New'; font-size: 16px; box-sizing: border-box;
+    .form-group{ margin-bottom:15px; }
+    .form-label{ display:block; font-size:12px; color:#666; margin-bottom:5px; font-family:'Courier New'; }
+    .form-input{
+      width:100%; padding:10px;
+      border:1px solid #ccc;
+      background:#f9f9f9;
+      font-family:'Courier New';
+      font-size:16px;
+      box-sizing:border-box;
     }
-    .modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-    .btn-s { padding: 8px 16px; border: none; cursor: pointer; font-family: 'Courier New'; font-weight: bold; }
-    .btn-cancel { background: #eee; }
-    .btn-confirm { background: var(--stamp-color); color: #fff; }
+    .modal-btns{ display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
+    .btn-s{ padding:8px 16px; border:none; cursor:pointer; font-family:'Courier New'; font-weight:bold; }
+    .btn-cancel{ background:#eee; }
+    .btn-confirm{ background:var(--stamp-color); color:#fff; }
 
-    .upload-link { font-size: 12px; color: #999; text-decoration: underline; cursor: pointer; display: block; margin-top: 5px;}
-    .hint { margin-top: 8px; font-size: 11px; color: #888; line-height: 1.4; max-width: 260px; }
+    .upload-link{
+      font-size:12px;
+      color:#999;
+      text-decoration:underline;
+      cursor:pointer;
+      display:block;
+      margin-top:5px;
+    }
+    .hint{
+      margin-top:8px;
+      font-size:11px;
+      color:#888;
+      line-height:1.4;
+      max-width:260px;
+    }
 
     /* =========================
-       NEW: plan section on right
+       plan section (right)
        ========================= */
-    .plan-section {
-      margin: 12px 20px 10px 20px; /* 与 log-header / log-list 同宽对齐 */
-      padding: 12px 12px 10px 12px;
-      border: 1px solid #d9d9d9;
-      border-radius: 8px;
+    .plan-section{
+      margin:12px 20px 10px 20px;
+      padding:12px 12px 10px 12px;
+      border:1px solid #d9d9d9;
+      border-radius:8px;
       background:
         linear-gradient(180deg, rgba(255,255,255,0.75), rgba(250,250,250,0.75)),
         radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
-      background-size: auto, 10px 10px;
-      box-shadow: inset 0 1px 0 rgba(0,0,0,0.03);
+      background-size:auto, 10px 10px;
+      box-shadow:inset 0 1px 0 rgba(0,0,0,0.03);
     }
 
-    .plan-top {
-      display: grid;
-      grid-template-columns: 1fr 140px;
-      gap: 10px;
-      align-items: center;
-      padding-bottom: 8px;
-      border-bottom: 1px dashed #cfcfcf;
-      margin-bottom: 10px;
+    .plan-top{
+      display:grid;
+      grid-template-columns:1fr 140px;
+      gap:10px;
+      align-items:center;
+      padding-bottom:8px;
+      border-bottom:1px dashed #cfcfcf;
+      margin-bottom:10px;
     }
-    .plan-title {
-      font-family: "Courier New", monospace;
-      font-weight: 800;
-      letter-spacing: 0.6px;
-      color: var(--ink);
-      font-size: 12px;
+    .plan-title{
+      font-family:"Courier New",monospace;
+      font-weight:800;
+      letter-spacing:0.6px;
+      color:var(--ink);
+      font-size:12px;
     }
-    .plan-input {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid #cfcfcf;
-      border-radius: 6px;
-      background: #fff;
-      font-family: "Courier New", monospace;
-      font-size: 13px;
-      box-sizing: border-box;
-    }
-
-    .delta-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 10px;
-      font-family: "Courier New", monospace;
-      margin-bottom: 8px;
-    }
-    .delta-kpi {
-      font-weight: 900;
-      font-size: 14px;
-      letter-spacing: 0.3px;
-      color: var(--stamp-color);
-    }
-    .delta-sub {
-      font-size: 12px;
-      color: var(--muted);
-      white-space: nowrap;
+    .plan-input{
+      width:100%;
+      padding:8px 10px;
+      border:1px solid #cfcfcf;
+      border-radius:6px;
+      background:#fff;
+      font-family:"Courier New",monospace;
+      font-size:13px;
+      box-sizing:border-box;
     }
 
-    /* 印刷风进度条：细描边 + 网点 + “尺规虚线” */
-    .bar-track {
-      position: relative;
-      height: 14px;
-      border: 1px solid var(--track-border);
-      border-radius: 999px;
+    /* NEW: forecast line under target date */
+    .plan-forecast{
+      margin-top:-2px;
+      margin-bottom:8px;
+      font-family:"Courier New",monospace;
+      font-size:11px;
+      color:var(--muted);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .plan-forecast strong{
+      color:var(--ink);
+      font-weight:900;
+      letter-spacing:0.2px;
+    }
+    .plan-forecast .badge{
+      border:1px solid #d3d3d3;
+      padding:2px 6px;
+      border-radius:999px;
+      background:linear-gradient(180deg,#fff,#f4f4f4);
+      color:#444;
+    }
+
+    .delta-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:10px;
+      font-family:"Courier New",monospace;
+      margin-bottom:8px;
+    }
+    .delta-kpi{
+      font-weight:900;
+      font-size:14px;
+      letter-spacing:0.3px;
+      color:var(--stamp-color);
+    }
+    .delta-sub{
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    /* print-style bar */
+    .bar-wrap{ position:relative; }
+    .bar-track{
+      position:relative;
+      height:14px;
+      border:1px solid var(--track-border);
+      border-radius:999px;
       background:
         linear-gradient(180deg, rgba(255,255,255,0.9), rgba(240,240,240,0.9)),
         radial-gradient(rgba(0,0,0,0.06) 0.8px, transparent 0.9px);
-      background-size: auto, 6px 6px;
-      overflow: hidden;
+      background-size:auto, 6px 6px;
+      overflow:hidden;
     }
-
-    .bar-actual {
-      position: absolute;
-      left: 0; top: 0;
-      height: 100%;
-      width: 0%;
-      background:
-        linear-gradient(180deg, rgba(183,28,28,0.92), rgba(150,18,18,0.92));
-      border-radius: 999px;
-      /* 油墨轻微压痕 */
+    .bar-actual{
+      position:absolute;
+      left:0; top:0;
+      height:100%;
+      width:0%;
+      background:linear-gradient(180deg, rgba(183,28,28,0.92), rgba(150,18,18,0.92));
+      border-radius:999px;
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.25),
         inset 0 -1px 0 rgba(0,0,0,0.18),
         0 0 0 1px rgba(0,0,0,0.08);
     }
-
-    /* 预计线：像尺规一样，有顶部小帽 + 虚线主体 */
-    .bar-expected-line {
-      position: absolute;
-      top: -7px;
-      height: 28px;
-      width: 0;
-      left: 0%;
-      border-left: 2px dashed rgba(44,62,80,0.7);
-      pointer-events: none;
+    .bar-expected-line{
+      position:absolute;
+      top:-7px;
+      height:28px;
+      width:0;
+      left:0%;
+      border-left:2px dashed rgba(44,62,80,0.7);
+      pointer-events:none;
     }
-    .bar-expected-line::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -5px;
-      width: 10px;
-      height: 0;
-      border-top: 2px solid rgba(44,62,80,0.7);
+    .bar-expected-line::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:-5px;
+      width:10px;
+      height:0;
+      border-top:2px solid rgba(44,62,80,0.7);
     }
 
-    .bar-legend {
-      margin-top: 8px;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      font-family: "Courier New", monospace;
-      font-size: 11px;
-      color: var(--muted);
-      align-items: center;
-      flex-wrap: wrap;
+    /* NEW: ruler ticks */
+    .ruler{
+      position:relative;
+      height:10px;
+      margin-top:6px;
+      border-left:1px solid rgba(0,0,0,0.08);
+      border-right:1px solid rgba(0,0,0,0.08);
+    }
+    .ruler .tick{
+      position:absolute;
+      bottom:0;
+      width:0;
+      border-left:1px solid rgba(44,62,80,0.22);
+      height:6px;
+    }
+    .ruler .tick.major{
+      height:9px;
+      border-left-color:rgba(44,62,80,0.35);
     }
 
-    .legend-item { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
-    .dot { width: 14px; height: 8px; border-radius: 999px; background: var(--stamp-color); }
-    .dash { width: 14px; height: 0; border-top: 2px dashed rgba(44,62,80,0.7); }
-    .plan-meta { opacity: 0.95; }
+    .ruler-labels{
+      margin-top:2px;
+      display:flex;
+      justify-content:space-between;
+      font-family:"Courier New",monospace;
+      font-size:10px;
+      color:#777;
+      letter-spacing:0.2px;
+      user-select:none;
+    }
 
+    .bar-legend{
+      margin-top:8px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-family:"Courier New",monospace;
+      font-size:11px;
+      color:var(--muted);
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .legend-item{ display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+    .dot{ width:14px; height:8px; border-radius:999px; background:var(--stamp-color); }
+    .dash{ width:14px; height:0; border-top:2px dashed rgba(44,62,80,0.7); }
+    .plan-meta{ opacity:0.95; }
   </style>
 </head>
 <body>
@@ -389,9 +479,7 @@
           <span class="upload-link" onclick="document.getElementById('imgUpload').click()">[更换自定义印章图]</span>
           <span class="upload-link" id="resetImg" style="display:none; color:red;">[恢复默认印章]</span>
           <input type="file" id="imgUpload" accept="image/*" style="display: none;">
-          <div class="hint">
-            自定义图片将自动“白底透明化”（阈值处理）。背景复杂时效果可能不理想。
-          </div>
+          <div class="hint">自定义图片将自动“白底透明化”（阈值处理）。背景复杂时效果可能不理想。</div>
         </div>
       </div>
 
@@ -413,11 +501,16 @@
       <div style="font-size:10px; color:#999; margin-top:5px;">HISTORY RECORDS</div>
     </div>
 
-    <!-- ✅ 计划/差值条：放到天级明细下面，宽度与 log 对齐 -->
     <div class="plan-section" id="planSection">
       <div class="plan-top">
         <div class="plan-title">TARGET FINISH DATE</div>
         <input type="date" id="finishDateInput" class="plan-input" />
+      </div>
+
+      <!-- NEW: forecast eta -->
+      <div class="plan-forecast">
+        <span id="forecastEta"><strong>Forecast</strong>: N/A</span>
+        <span id="forecastSpeed" class="badge">Speed: - pg/day</span>
       </div>
 
       <div class="delta-header">
@@ -425,9 +518,17 @@
         <div id="deltaSub" class="delta-sub">Actual 0% | Expected 0%</div>
       </div>
 
-      <div class="bar-track" aria-label="progress-delta-bar">
-        <div id="barActual" class="bar-actual"></div>
-        <div id="barExpected" class="bar-expected-line" title="Expected (dashed)"></div>
+      <div class="bar-wrap">
+        <div class="bar-track" aria-label="progress-delta-bar">
+          <div id="barActual" class="bar-actual"></div>
+          <div id="barExpected" class="bar-expected-line" title="Expected (dashed)"></div>
+        </div>
+
+        <!-- NEW: ruler ticks (every 10%, major at 0/25/50/75/100) -->
+        <div class="ruler" id="ruler"></div>
+        <div class="ruler-labels">
+          <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+        </div>
       </div>
 
       <div class="bar-legend">
@@ -466,11 +567,11 @@
 <script>
   const STORAGE_KEY = 'reading_desktop_v3';
   const IMG_KEY = 'reading_desktop_img_v2';
-  const PLAN_KEY = 'reading_desktop_plan_v1';
+  const PLAN_KEY = 'reading_desktop_plan_v2'; // bump
 
   const state = {
     currentDate: new Date(),
-    records: {},
+    records: {}, // { "YYYY-MM-DD": { page:number, ts:number|null } }
     totalPages: 300,
     customImage: null,
     finishDate: null,
@@ -494,9 +595,13 @@
   const deltaKpiEl = document.getElementById('deltaKpi');
   const deltaSubEl = document.getElementById('deltaSub');
   const planMetaEl = document.getElementById('planMeta');
+  const forecastEtaEl = document.getElementById('forecastEta');
+  const forecastSpeedEl = document.getElementById('forecastSpeed');
+  const rulerEl = document.getElementById('ruler');
 
-  function init() {
+  function init(){
     loadData();
+    buildRulerTicks();
     renderCalendar(state.currentDate);
     renderLog();
     updateDashboard();
@@ -511,41 +616,53 @@
     updatePlanDeltaBar();
   }
 
+  // utils
   function pad2(n){ return String(n).padStart(2,'0'); }
-  function todayStr() {
+  function todayStr(){
     const d = new Date();
     return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
   }
-  function formatHM(ts) {
-    if (!ts) return '';
+  function formatHM(ts){
+    if(!ts) return '';
     const d = new Date(ts);
     return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
   }
-  function getRecordPage(rec) {
-    if (rec == null) return null;
-    if (typeof rec === 'number') return rec;
-    if (typeof rec === 'object' && rec.page != null) return rec.page;
+  function getRecordPage(rec){
+    if(rec==null) return null;
+    if(typeof rec==='number') return rec;
+    if(typeof rec==='object' && rec.page!=null) return rec.page;
     return null;
   }
-  function getRecordTs(rec) {
-    if (rec == null) return null;
-    if (typeof rec === 'object' && rec.ts != null) return rec.ts;
+  function getRecordTs(rec){
+    if(rec==null) return null;
+    if(typeof rec==='object' && rec.ts!=null) return rec.ts;
     return null;
   }
   function clamp01(x){ return Math.max(0, Math.min(1, x)); }
 
-  function parseDateOnly(yyyyMMdd) {
+  function parseDateOnly(yyyyMMdd){
     const [y,m,d] = yyyyMMdd.split('-').map(Number);
     return new Date(y, m-1, d, 12, 0, 0, 0);
   }
-  function daysBetween(a, b) {
+  function daysBetween(a,b){
     const ms = b.getTime() - a.getTime();
     return Math.round(ms / 86400000);
   }
+  function addDays(dateObj, days){
+    const d = new Date(dateObj.getTime());
+    d.setDate(d.getDate() + days);
+    return d;
+  }
+  function formatDateYMD(dateObj){
+    return `${dateObj.getFullYear()}-${pad2(dateObj.getMonth()+1)}-${pad2(dateObj.getDate())}`;
+  }
+  function formatDatePrint(yyyyMMdd){
+    return yyyyMMdd.replace(/-/g,'.');
+  }
 
   // stamps
-  function createDefaultStampSVG(dateStr) {
-    const formattedDate = dateStr.replace(/-/g, '.');
+  function createDefaultStampSVG(dateStr){
+    const formattedDate = dateStr.replace(/-/g,'.');
     const rec = state.records[dateStr];
     const hm = formatHM(getRecordTs(rec));
 
@@ -559,11 +676,11 @@
         <circle class="stamp-ring" cx="40" cy="40" r="38" stroke-width="2"></circle>
         <circle class="stamp-ring" cx="40" cy="40" r="34" stroke-width="1"></circle>
 
-        <path id="${pathId}" d="M ${startX},${startY} A ${r},${r} 0 1,1 ${40 + r},${40}" fill="none"></path>
+        <path id="${pathId}" d="M ${startX},${startY} A ${r},${r} 0 1,1 ${40+r},${40}" fill="none"></path>
 
         <text class="stamp-text-path">
           <textPath href="#${pathId}" startOffset="50%" text-anchor="middle">
-            ★ ${formattedDate}${hm ? ' ' + hm : ''} ★
+            ★ ${formattedDate}${hm ? ' '+hm : ''} ★
           </textPath>
         </text>
 
@@ -572,8 +689,8 @@
     `;
   }
 
-  function createCustomStampHTML(dateStr) {
-    const formattedDate = dateStr.replace(/-/g, '.');
+  function createCustomStampHTML(dateStr){
+    const formattedDate = dateStr.replace(/-/g,'.');
     const rec = state.records[dateStr];
     const hm = formatHM(getRecordTs(rec));
 
@@ -587,10 +704,10 @@
         <div class="stamp-custom-img" style="background-image:url('${state.customImage}')"></div>
         <div class="stamp-custom-overlay">
           <svg viewBox="0 0 80 80" aria-label="custom-stamp-overlay">
-            <path id="${pathId}" d="M ${startX},${startY} A ${r},${r} 0 1,1 ${40 + r},${40}" fill="none"></path>
+            <path id="${pathId}" d="M ${startX},${startY} A ${r},${r} 0 1,1 ${40+r},${40}" fill="none"></path>
             <text class="stamp-text-path">
               <textPath href="#${pathId}" startOffset="50%" text-anchor="middle">
-                ★ ${formattedDate}${hm ? ' ' + hm : ''} ★
+                ★ ${formattedDate}${hm ? ' '+hm : ''} ★
               </textPath>
             </text>
           </svg>
@@ -599,104 +716,100 @@
     `;
   }
 
-  function createStampHTML(dateStr) {
-    if (state.customImage) return createCustomStampHTML(dateStr);
+  function createStampHTML(dateStr){
+    if(state.customImage) return createCustomStampHTML(dateStr);
     return createDefaultStampSVG(dateStr);
   }
 
   // calendar
-  function renderCalendar(date) {
+  function renderCalendar(date){
     const year = date.getFullYear();
     const month = date.getMonth();
-    monthHeaderEl.textContent = `${year} . ${pad2(month + 1)}`;
-
+    monthHeaderEl.textContent = `${year} . ${pad2(month+1)}`;
     calendarEl.innerHTML = '';
 
-    ['SUN','MON','TUE','WED','THU','FRI','SAT'].forEach(d => {
+    ['SUN','MON','TUE','WED','THU','FRI','SAT'].forEach(d=>{
       const el = document.createElement('div');
-      el.className = 'weekday';
-      el.textContent = d;
+      el.className='weekday';
+      el.textContent=d;
       calendarEl.appendChild(el);
     });
 
     const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInMonth = new Date(year, month+1, 0).getDate();
 
-    for(let i=0; i<firstDay; i++) {
+    for(let i=0;i<firstDay;i++){
       const el = document.createElement('div');
-      el.className = 'day-cell empty';
+      el.className='day-cell empty';
       calendarEl.appendChild(el);
     }
 
-    for(let i=1; i<=daysInMonth; i++) {
+    for(let i=1;i<=daysInMonth;i++){
       const el = document.createElement('div');
-      el.className = 'day-cell';
+      el.className='day-cell';
       const dateStr = `${year}-${pad2(month+1)}-${pad2(i)}`;
       el.dataset.date = dateStr;
 
       const num = document.createElement('span');
-      num.className = 'day-number';
-      num.textContent = i;
+      num.className='day-number';
+      num.textContent=i;
       el.appendChild(num);
 
       const rec = state.records[dateStr];
       const page = getRecordPage(rec);
 
-      if (page != null) {
+      if(page!=null){
         const stampBox = document.createElement('div');
-        stampBox.className = 'stamp-container saved';
-        const rot = Math.floor(Math.random() * 30) - 15;
-        stampBox.style.transform = `translate(-50%, -50%) rotate(${rot}deg)`;
+        stampBox.className='stamp-container saved';
+        const rot = Math.floor(Math.random()*30)-15;
+        stampBox.style.transform = `translate(-50%,-50%) rotate(${rot}deg)`;
         stampBox.innerHTML = createStampHTML(dateStr);
         el.appendChild(stampBox);
 
         const ts = getRecordTs(rec);
-        el.title = `Page: ${page}${ts ? (' | Time: ' + formatHM(ts)) : ''}`;
+        el.title = `Page: ${page}${ts ? (' | Time: '+formatHM(ts)) : ''}`;
       }
 
-      el.addEventListener('click', () => openModal(dateStr));
+      el.addEventListener('click', ()=>openModal(dateStr));
       calendarEl.appendChild(el);
     }
   }
 
   // storage
-  function loadData() {
+  function loadData(){
     const v2 = localStorage.getItem('reading_desktop_v2');
     const v1 = localStorage.getItem('reading_desktop_v1');
     const cur = localStorage.getItem(STORAGE_KEY);
 
-    let payload = null;
-    if (cur) payload = JSON.parse(cur);
-    else if (v2) payload = JSON.parse(v2);
-    else if (v1) payload = JSON.parse(v1);
+    let payload=null;
+    if(cur) payload = JSON.parse(cur);
+    else if(v2) payload = JSON.parse(v2);
+    else if(v1) payload = JSON.parse(v1);
 
-    if (payload) {
+    if(payload){
       state.totalPages = payload.totalPages || 300;
       state.records = payload.records || {};
-      for (const [d, v] of Object.entries(state.records)) {
-        if (typeof v === 'number') {
-          state.records[d] = { page: v, ts: null };
-        } else if (typeof v === 'object' && v) {
-          state.records[d] = { page: Number(v.page ?? 0), ts: v.ts ?? null };
-        }
+      for(const [d,v] of Object.entries(state.records)){
+        if(typeof v === 'number') state.records[d] = { page:v, ts:null };
+        else if(typeof v === 'object' && v) state.records[d] = { page:Number(v.page ?? 0), ts:v.ts ?? null };
       }
     }
 
     const img = localStorage.getItem(IMG_KEY) || localStorage.getItem('reading_desktop_img') || localStorage.getItem('reading_desktop_img_v2');
-    if (img) state.customImage = img;
+    if(img) state.customImage = img;
 
     const plan = localStorage.getItem(PLAN_KEY);
-    if (plan) {
-      try {
+    if(plan){
+      try{
         const p = JSON.parse(plan);
         state.finishDate = p.finishDate || null;
-      } catch(e) {}
+      }catch(e){}
     }
 
     document.getElementById('totalPagesInput').value = state.totalPages;
   }
 
-  function saveData() {
+  function saveData(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       records: state.records,
       totalPages: Number(state.totalPages)
@@ -706,121 +819,201 @@
     updatePlanDeltaBar();
   }
 
-  function savePlan() {
+  function savePlan(){
     localStorage.setItem(PLAN_KEY, JSON.stringify({ finishDate: state.finishDate }));
     updatePlanDeltaBar();
   }
 
   // log & dashboard
-  function renderLog() {
-    logListEl.innerHTML = '';
-    const sorted = Object.entries(state.records)
-      .sort((a,b) => new Date(b[0]) - new Date(a[0]));
+  function renderLog(){
+    logListEl.innerHTML='';
+    const sorted = Object.entries(state.records).sort((a,b)=> new Date(b[0]) - new Date(a[0]));
 
-    if (sorted.length === 0) {
-      logListEl.innerHTML = '<li style="text-align:center; color:#ccc; padding:20px;">No records yet</li>';
+    if(sorted.length===0){
+      logListEl.innerHTML='<li style="text-align:center; color:#ccc; padding:20px;">No records yet</li>';
       return;
     }
 
-    sorted.forEach(([date, rec]) => {
+    sorted.forEach(([date,rec])=>{
       const page = getRecordPage(rec);
       const hm = formatHM(getRecordTs(rec));
       const li = document.createElement('li');
-      li.className = 'log-item';
-      li.innerHTML = `
-        <span class="log-date">${date.replace(/-/g, '.')} ${hm ? (' ' + hm) : ''}</span>
+      li.className='log-item';
+      li.innerHTML=`
+        <span class="log-date">${date.replace(/-/g,'.')} ${hm ? (' '+hm) : ''}</span>
         <span class="log-page">P. ${page}</span>
       `;
       logListEl.appendChild(li);
     });
   }
 
-  function updateDashboard() {
-    const pages = Object.values(state.records).map(getRecordPage).filter(v => v != null);
+  function updateDashboard(){
+    const pages = Object.values(state.records).map(getRecordPage).filter(v=>v!=null);
     const max = pages.length ? Math.max(...pages) : 0;
     document.getElementById('maxPageRead').textContent = max;
 
-    let p = 0;
-    if(state.totalPages > 0) p = (max / state.totalPages) * 100;
+    let p=0;
+    if(state.totalPages>0) p = (max/state.totalPages)*100;
     if(p>100) p=100;
 
-    document.getElementById('percentText').textContent = Math.round(p) + '%';
-    progressRing.style.setProperty('--p', p + '%');
+    document.getElementById('percentText').textContent = Math.round(p)+'%';
+    progressRing.style.setProperty('--p', p+'%');
   }
 
-  // plan/delta
-  function onFinishDateChange(e) {
+  // plan: change target date
+  function onFinishDateChange(e){
     const val = e.target.value;
     state.finishDate = val || null;
     savePlan();
   }
 
-  function getStartDateForPlan() {
+  function getStartDateForPlan(){
     const keys = Object.keys(state.records);
-    if (!keys.length) return todayStr();
-    keys.sort((a,b) => new Date(a) - new Date(b));
+    if(!keys.length) return todayStr();
+    keys.sort((a,b)=> new Date(a) - new Date(b));
     return keys[0];
   }
 
-  function calcActualPct() {
-    const pages = Object.values(state.records).map(getRecordPage).filter(v => v != null);
-    const max = pages.length ? Math.max(...pages) : 0;
-    if (!state.totalPages || state.totalPages <= 0) return 0;
-    return clamp01(max / state.totalPages);
+  function getMaxPage(){
+    const pages = Object.values(state.records).map(getRecordPage).filter(v=>v!=null);
+    return pages.length ? Math.max(...pages) : 0;
   }
 
-  function calcExpectedPct() {
-    if (!state.finishDate) return 0;
+  function calcActualPct(){
+    const max = getMaxPage();
+    if(!state.totalPages || state.totalPages<=0) return 0;
+    return clamp01(max/state.totalPages);
+  }
+
+  function calcExpectedPct(){
+    if(!state.finishDate) return 0;
     const startStr = getStartDateForPlan();
     const start = parseDateOnly(startStr);
     const end = parseDateOnly(state.finishDate);
     const now = parseDateOnly(todayStr());
 
     const total = daysBetween(start, end);
-    if (total <= 0) return 1;
+    if(total<=0) return 1;
 
     const elapsed = daysBetween(start, now);
-    return clamp01(elapsed / total);
+    return clamp01(elapsed/total);
   }
 
-  function updatePlanDeltaBar() {
+  // NEW: robust speed estimation & ETA
+  function calcSpeedPagesPerDay(){
+    // 用“有记录的天”计算（更稳健）
+    const entries = Object.entries(state.records)
+      .map(([d,rec]) => [d, getRecordPage(rec)])
+      .filter(([,p]) => p!=null)
+      .sort((a,b)=> new Date(a[0]) - new Date(b[0]));
+
+    if(entries.length < 2) return 0;
+
+    // 用差分求每天推进（忽略回退/异常负值）
+    let sum=0, cnt=0;
+    for(let i=1;i<entries.length;i++){
+      const prev = entries[i-1][1];
+      const cur = entries[i][1];
+      const delta = cur - prev;
+      if(delta > 0){
+        sum += delta;
+        cnt += 1;
+      }
+    }
+    if(cnt===0) return 0;
+    return sum / cnt; // pages per recorded day
+  }
+
+  function calcForecastEta(){
+    const total = Number(state.totalPages || 0);
+    const max = getMaxPage();
+    if(total<=0) return { eta:null, speed:0, remaining:0, done:false };
+
+    if(max >= total) return { eta: formatDateYMD(parseDateOnly(todayStr())), speed:0, remaining:0, done:true };
+
+    const speed = calcSpeedPagesPerDay();
+    const remaining = Math.max(0, total - max);
+
+    if(speed <= 0) return { eta:null, speed, remaining, done:false };
+
+    // 用 recorded-day 口径推到自然日：保守做法=按每天读（1天=1记录日），简单直接
+    const daysNeed = Math.ceil(remaining / speed);
+    const etaDate = addDays(parseDateOnly(todayStr()), daysNeed);
+    return { eta: formatDateYMD(etaDate), speed, remaining, done:false };
+  }
+
+  function updatePlanDeltaBar(){
     const startStr = getStartDateForPlan();
     const endStr = state.finishDate || '-';
-    planMetaEl.textContent = `Start ${startStr.replace(/-/g,'.')} / End ${endStr === '-' ? '-' : endStr.replace(/-/g,'.')}`;
+    planMetaEl.textContent = `Start ${formatDatePrint(startStr)} / End ${endStr==='-'?'-':formatDatePrint(endStr)}`;
 
     const actual = calcActualPct();
     const expected = state.finishDate ? calcExpectedPct() : 0;
 
     barActualEl.style.width = `${Math.round(actual*1000)/10}%`;
 
-    if (!state.finishDate) {
-      barExpectedEl.style.display = 'none';
+    if(!state.finishDate){
+      barExpectedEl.style.display='none';
       deltaSubEl.textContent = `Actual ${Math.round(actual*1000)/10}% | Expected -`;
       deltaKpiEl.textContent = `Δ -`;
-      return;
+    }else{
+      barExpectedEl.style.display='block';
+      barExpectedEl.style.left = `${Math.round(expected*1000)/10}%`;
+
+      const delta = actual - expected;
+      const deltaPct = Math.round(delta*1000)/10;
+      const actualPct = Math.round(actual*1000)/10;
+      const expectedPct = Math.round(expected*1000)/10;
+
+      const sign = deltaPct>0 ? '+' : '';
+      deltaKpiEl.textContent = `Δ ${sign}${deltaPct}%`;
+      deltaSubEl.textContent = `Actual ${actualPct}% | Expected ${expectedPct}%`;
     }
 
-    barExpectedEl.style.display = 'block';
-    barExpectedEl.style.left = `${Math.round(expected*1000)/10}%`;
+    // NEW: forecast display
+    const f = calcForecastEta();
+    const sp = f.speed ? (Math.round(f.speed*10)/10) : 0;
+    forecastSpeedEl.textContent = `Speed: ${sp ? sp : '-'} pg/day`;
 
-    const delta = actual - expected;
-    const deltaPct = Math.round(delta * 1000) / 10;
-    const actualPct = Math.round(actual * 1000) / 10;
-    const expectedPct = Math.round(expected * 1000) / 10;
+    if(f.done){
+      forecastEtaEl.innerHTML = `<strong>Forecast</strong>: DONE`;
+    }else if(!f.eta){
+      forecastEtaEl.innerHTML = `<strong>Forecast</strong>: N/A`;
+    }else{
+      forecastEtaEl.innerHTML = `<strong>Forecast</strong>: ${formatDatePrint(f.eta)} <span style="opacity:.9;">(≈ ${f.remaining} pages left)</span>`;
+    }
+  }
 
-    const sign = deltaPct > 0 ? '+' : '';
-    deltaKpiEl.textContent = `Δ ${sign}${deltaPct}%`;
-    deltaSubEl.textContent = `Actual ${actualPct}% | Expected ${expectedPct}%`;
+  // ruler ticks
+  function buildRulerTicks(){
+    rulerEl.innerHTML = '';
+    // every 10%
+    for(let i=0;i<=10;i++){
+      const pct = i*10;
+      const t = document.createElement('div');
+      t.className = 'tick';
+      t.style.left = `${pct}%`;
+      // major at 0/25/50/75/100 + also at 50 already; for 25/75 we can't hit with 10-step, add separately below
+      if(pct===0 || pct===50 || pct===100) t.classList.add('major');
+      rulerEl.appendChild(t);
+    }
+    // add 25 and 75 major ticks
+    [25,75].forEach(pct=>{
+      const t = document.createElement('div');
+      t.className = 'tick major';
+      t.style.left = `${pct}%`;
+      rulerEl.appendChild(t);
+    });
   }
 
   // modal
-  function openModal(dateStr) {
+  function openModal(dateStr){
     modal.classList.add('open');
-    if(dateStr) {
+    if(dateStr){
       dateInput.value = dateStr;
       const rec = state.records[dateStr];
       pageInput.value = (getRecordPage(rec) ?? '');
-    } else {
+    }else{
       dateInput.valueAsDate = new Date();
       const today = dateInput.value;
       const rec = state.records[today];
@@ -829,40 +1022,40 @@
     pageInput.focus();
   }
 
-  document.getElementById('cancelBtn').addEventListener('click', () => modal.classList.remove('open'));
-  document.getElementById('mainCheckBtn').addEventListener('click', () => openModal());
+  document.getElementById('cancelBtn').addEventListener('click', ()=>modal.classList.remove('open'));
+  document.getElementById('mainCheckBtn').addEventListener('click', ()=>openModal());
 
-  document.getElementById('confirmBtn').addEventListener('click', () => {
+  document.getElementById('confirmBtn').addEventListener('click', ()=>{
     const d = dateInput.value;
-    const p = parseInt(pageInput.value, 10);
+    const p = parseInt(pageInput.value,10);
     if(!d || isNaN(p)) return alert('Please enter valid date and page.');
 
     const inputD = new Date(d);
-    for(const [rd, rv] of Object.entries(state.records)) {
+    for(const [rd, rv] of Object.entries(state.records)){
       const rp = getRecordPage(rv);
-      if(new Date(rd) > inputD && p > rp) {
+      if(new Date(rd) > inputD && p > rp){
         return alert(`Logic Error: You recorded page ${rp} on ${rd}. Usually page count shouldn't decrease backwards.`);
       }
     }
 
     const nowTs = Date.now();
-    state.records[d] = { page: p, ts: nowTs };
+    state.records[d] = { page:p, ts:nowTs };
     saveData();
 
     const [y,m] = d.split('-').map(Number);
-    if(y !== state.currentDate.getFullYear() || m-1 !== state.currentDate.getMonth()) {
+    if(y !== state.currentDate.getFullYear() || m-1 !== state.currentDate.getMonth()){
       state.currentDate = new Date(y, m-1, 1);
       renderCalendar(state.currentDate);
     }
 
     const cell = document.querySelector(`.day-cell[data-date="${d}"]`);
-    if(cell) {
+    if(cell){
       const old = cell.querySelector('.stamp-container');
       if(old) old.remove();
 
       const div = document.createElement('div');
       div.className = 'stamp-container animate-land';
-      div.style.transform = `translate(-50%, -50%) rotate(${Math.floor(Math.random()*20)-10}deg)`;
+      div.style.transform = `translate(-50%,-50%) rotate(${Math.floor(Math.random()*20)-10}deg)`;
       div.innerHTML = createStampHTML(d);
       cell.appendChild(div);
       cell.title = `Page: ${p} | Time: ${formatHM(nowTs)}`;
@@ -872,75 +1065,72 @@
   });
 
   // month nav
-  document.getElementById('prevMonth').addEventListener('click', () => {
+  document.getElementById('prevMonth').addEventListener('click', ()=>{
     state.currentDate.setMonth(state.currentDate.getMonth()-1);
     renderCalendar(state.currentDate);
   });
-  document.getElementById('nextMonth').addEventListener('click', () => {
+  document.getElementById('nextMonth').addEventListener('click', ()=>{
     state.currentDate.setMonth(state.currentDate.getMonth()+1);
     renderCalendar(state.currentDate);
   });
 
   // settings
-  document.getElementById('totalPagesInput').addEventListener('change', (e) => {
+  document.getElementById('totalPagesInput').addEventListener('change', (e)=>{
     state.totalPages = e.target.value;
     saveData();
   });
 
   // custom image -> transparent
-  imgUpload.addEventListener('change', async (e) => {
+  imgUpload.addEventListener('change', async (e)=>{
     const f = e.target.files[0];
     if(!f) return;
     if(f.size > 800*1024) return alert('Image too large (>800KB).');
 
-    try {
+    try{
       const dataUrl = await fileToDataURL(f);
-      const transparentUrl = await makeNearWhiteTransparent(dataUrl, {
-        whiteThreshold: 245,
-        alphaCut: 25,
-      });
+      const transparentUrl = await makeNearWhiteTransparent(dataUrl, { whiteThreshold:245, alphaCut:25 });
 
       state.customImage = transparentUrl;
       localStorage.setItem(IMG_KEY, state.customImage);
       updateUploadUI();
       renderCalendar(state.currentDate);
-    } catch (err) {
+    }catch(err){
       console.error(err);
       alert('Failed to process image. Try another image.');
     }
   });
 
-  resetImgBtn.addEventListener('click', () => {
+  resetImgBtn.addEventListener('click', ()=>{
     state.customImage = null;
     localStorage.removeItem(IMG_KEY);
     updateUploadUI();
     renderCalendar(state.currentDate);
   });
 
-  function updateUploadUI() {
+  function updateUploadUI(){
     resetImgBtn.style.display = state.customImage ? 'inline' : 'none';
   }
 
-  function fileToDataURL(file) {
-    return new Promise((resolve, reject) => {
+  function fileToDataURL(file){
+    return new Promise((resolve,reject)=>{
       const r = new FileReader();
-      r.onload = () => resolve(r.result);
+      r.onload = ()=>resolve(r.result);
       r.onerror = reject;
       r.readAsDataURL(file);
     });
   }
 
-  function loadImage(src) {
-    return new Promise((resolve, reject) => {
+  function loadImage(src){
+    return new Promise((resolve,reject)=>{
       const img = new Image();
-      img.onload = () => resolve(img);
+      img.onload = ()=>resolve(img);
       img.onerror = reject;
       img.crossOrigin = 'anonymous';
       img.src = src;
     });
   }
 
-  async function makeNearWhiteTransparent(dataUrl, opts = {}) {
+  async function makeNearWhiteTransparent(dataUrl, opts={}){
     const whiteThreshold = opts.whiteThreshold ?? 245;
     const alphaCut = opts.alphaCut ?? 25;
 
@@ -952,31 +1142,30 @@
     const h = Math.max(1, Math.round(img.height * scale));
 
     const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d', { willReadFrequently:true });
 
     ctx.clearRect(0,0,w,h);
     ctx.drawImage(img, 0, 0, w, h);
-    const imageData = ctx.getImageData(0, 0, w, h);
+    const imageData = ctx.getImageData(0,0,w,h);
     const d = imageData.data;
 
-    for (let i = 0; i < d.length; i += 4) {
-      const r = d[i], g = d[i+1], b = d[i+2];
-      const lum = (r + g + b) / 3;
+    for(let i=0;i<d.length;i+=4){
+      const r=d[i], g=d[i+1], b=d[i+2];
+      const lum = (r+g+b)/3;
 
-      if (lum >= whiteThreshold) {
+      if(lum >= whiteThreshold){
         d[i+3] = 0;
-      } else {
+      }else{
         const delta = whiteThreshold - lum;
-        if (delta < alphaCut) {
-          const factor = delta / alphaCut;
-          d[i+3] = Math.round(d[i+3] * factor);
+        if(delta < alphaCut){
+          const factor = delta/alphaCut;
+          d[i+3] = Math.round(d[i+3]*factor);
         }
       }
     }
 
-    ctx.putImageData(imageData, 0, 0);
+    ctx.putImageData(imageData,0,0);
     return canvas.toDataURL('image/png', 0.92);
   }
 
